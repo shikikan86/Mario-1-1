@@ -38,6 +38,7 @@ public class PlayerController : MonoBehaviour
     public AudioClip song;
     public AudioClip opencan;
     public AudioClip victory;
+    public AudioClip BrickSound;
     public AudioSource source;
 
     float y;
@@ -228,6 +229,8 @@ public class PlayerController : MonoBehaviour
         //It will only "collide" if the player is sprinting or jumping, which isn't my intention, but that's ok I guess
         if(collision.collider.name == "Brick(Clone)" || collision.collider.name == "Brick")
         {
+            source.clip = BrickSound;
+            source.PlayOneShot(source.clip);
             score += 100;
             Destroy(collision.collider.gameObject);
         }
