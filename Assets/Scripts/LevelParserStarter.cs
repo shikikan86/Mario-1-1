@@ -16,34 +16,31 @@ public class LevelParserStarter : MonoBehaviour
 
     public GameObject Stone;
 
+    public GameObject Anomaly;
+
+    public GameObject Can;
+
+    public GameObject Coin;
+
     public Transform parentTransform;
 
     //Raycast Stuff
     public float length = 300f;
     public LayerMask mask;
 
-    public Text coins_text;
-    public int coins = 0;
-
     public Text timer;
-    public float start_time;
     // Start is called before the first frame update
     void Start()
     {
         RefreshParse();
-
-        //Displays initial coin text with 2 digit positions
-        string temp = string.Format("{0:00}", coins);
-        coins_text.text = "x" + temp;
-
     }
 
     void Update()
     {
 
         //Updates the timer, subtracting time elapsed from 375. "f0" means no decimals.
-        float t = 375f - Time.time;
-        timer.text = "Time \n" + t.ToString("f0");
+        //float t = 10f - Time.time;
+        //timer.text = "Time \n" + t.ToString("f0");
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -59,9 +56,23 @@ public class LevelParserStarter : MonoBehaviour
 
                 if (hit.collider.name == "Question(Clone)" || hit.collider.name == "Question")
                 {
-                    coins = coins + 1;
-                    string temp = string.Format("{0:00}", coins);
-                    coins_text.text = "x" + temp;
+                    //coins = coins + 1;
+                    //string temp = string.Format("{0:00}", coins);
+                    //coins_text.text = "x" + temp;
+                }
+
+                if (hit.collider.name == "Anomaly(Clone)" || hit.collider.name == "Anomaly")
+                {
+                    //kill player, end game
+                    //Mission failed we'll get em next time
+
+                }
+
+                if (hit.collider.name == "Cylindre001" || hit.collider.name == "Can")
+                {
+                    //win
+                    Destroy(hit.collider.gameObject);
+
                 }
 
                 Debug.Log(hit.collider.name);
@@ -85,7 +96,7 @@ public class LevelParserStarter : MonoBehaviour
             {
                 int column = 0;
                 char[] letters = line.ToCharArray();
-                Debug.Log(row + "," + column);
+                //Debug.Log(row + "," + column);
                 Vector3 myvector = new Vector3(row, column, 0);
                 foreach (var letter in letters)
                 {
@@ -107,17 +118,23 @@ public class LevelParserStarter : MonoBehaviour
 
         switch (spot)
         {
-            case 'b': Debug.Log("Spawn Brick");
+            case 'b': //Debug.Log("Spawn Brick");
                 ToSpawn = Brick;
                 break;
-            case '?': Debug.Log("Spawn QuestionBox");
-                ToSpawn = QuestionBox;
+            case 'g': //Debug.Log("Spawn QuestionBox");
+                ToSpawn = Coin;
                 break;
-            case 'x': Debug.Log("Spawn Rock");
+            case 'x': //Debug.Log("Spawn Rock");
                 ToSpawn = Rock;
                 break;
-            case 's': Debug.Log("Spawn Stone");
+            case 's': //Debug.Log("Spawn Stone");
                 ToSpawn = Stone;
+                break;
+            case 'a': //Debug.Log("Spawn Anomaly");
+                ToSpawn = Anomaly;
+                break;
+            case 'c': //Debug.Log("Spawn Can");
+                ToSpawn = Can;
                 break;
             //default: Debug.Log("Default Entered"); break;
             default: return;
@@ -140,4 +157,6 @@ public class LevelParserStarter : MonoBehaviour
         parentTransform = newParent.transform;
         FileParser();
     }
+
+    
 }
