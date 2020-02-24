@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,9 +21,10 @@ public class PlayerController : MonoBehaviour
 
     Animator animate;
 
-    bool inAir = false; //used for stopping the x movement upon landing after a jump
+    bool inAir = true; //used for stopping the x movement upon landing after a jump
     bool death = false;
     bool win = false;
+    bool firstLand = false;
 
     public int score = 0;
     public int coins = 0;
@@ -39,9 +41,14 @@ public class PlayerController : MonoBehaviour
     public AudioClip opencan;
     public AudioClip victory;
     public AudioClip BrickSound;
+    public AudioClip teleport;
+    public AudioClip land;
     public AudioSource source;
 
     float y;
+
+    public GameObject anomaly2;
+    public Transform reference;
 
     //these store the string format before updating the text
     string temp;
@@ -59,12 +66,15 @@ public class PlayerController : MonoBehaviour
         source = GetComponent<AudioSource>();
         source.clip = song;
         source.PlayOneShot(source.clip);
+        source.clip = teleport;
+        source.PlayOneShot(source.clip);
+
         
-        //other = GetComponent<Collider>();
     }
 
     void Update()
     {
+        
         //timer counting down
         if (!death)
         {
@@ -100,6 +110,12 @@ public class PlayerController : MonoBehaviour
         //if character is on the ground
         if (controller.isGrounded)
         {
+            if (!firstLand)
+            {
+                firstLand = true;
+                source.clip = land;
+                source.PlayOneShot(source.clip);
+            }
             //when the player lands, make him stop moving
             if (inAir)
             {
@@ -234,6 +250,11 @@ public class PlayerController : MonoBehaviour
             score += 100;
             Destroy(collision.collider.gameObject);
         }
+
+        if (collision.collider.name == "Anomaly gravity(Clone)" || collision.collider.name == "Anomaly gravity")
+        {
+            diebylava();
+        }
     }
 
     void OnTriggerEnter(Collider other)
@@ -245,6 +266,19 @@ public class PlayerController : MonoBehaviour
             //This makes it only play once when you win.
             if (!win)
             {
+                spawnlava(new Vector3(-10, 8, 0));
+                spawnlava(new Vector3(-9, -5, 0));
+                spawnlava(new Vector3(-8, 0, 0));
+                spawnlava(new Vector3(-7, 10, 0));
+                spawnlava(new Vector3(-6, 9, 0));
+                spawnlava(new Vector3(-5, 1, 0));
+                spawnlava(new Vector3(-4, 7, 0));
+                spawnlava(new Vector3(-3, 2, 0));
+                spawnlava(new Vector3(-2, 13, 0));
+                spawnlava(new Vector3(-1, 11, 0));
+                spawnlava(new Vector3(0, 30, 0));
+                spawnlava(new Vector3(1, 14, 0));
+                spawnlava(new Vector3(2, 3, 0));
                 win = true;
                 source.Stop();
                 source.clip = opencan;
@@ -270,19 +304,30 @@ public class PlayerController : MonoBehaviour
         //Die by lava
         if(other.name == "Anomaly(Clone)" || other.name == "Anomaly")
         {
-            score_text.text = "Player 1\nStatus: Crispy";
-            WinText.text = "You are now a crispy critter";
-            WinText.color = Color.red;
-            source.Stop(); //stop the bgm
-            death = true;
-            Time.timeScale = 0f; //freezes the time effectively
-            source.clip = Burn;
-            source.PlayOneShot(source.clip);
-            source.clip = wilhelm;
-            source.PlayOneShot(source.clip);
-            Debug.Log("Ouch");
+            diebylava();
         }
 
+    }
+
+    void spawnlava(Vector3 position)
+    {
+        GameObject.Instantiate(anomaly2, reference);
+        anomaly2.transform.localPosition = position;
+    }
+
+    void diebylava()
+    {
+        score_text.text = "Player 1\nStatus: Crispy";
+        WinText.text = "You are now a crispy critter";
+        WinText.color = Color.red;
+        source.Stop(); //stop the bgm
+        death = true;
+        Time.timeScale = 0f; //freezes the time effectively. Mainly to keep the camera from going down after the player disappears
+        source.clip = Burn;
+        source.PlayOneShot(source.clip);
+        source.clip = wilhelm;
+        source.PlayOneShot(source.clip);
+        Debug.Log("Ouch");
     }
 
 }
